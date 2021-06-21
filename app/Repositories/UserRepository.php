@@ -6,58 +6,51 @@ namespace App\Repositories;
 use App\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
-class UserRepository extends AbstractRepository
+class UserRepository
 {
 
-    /**
-     * UserRepository constructor.
-     * @param User $model
-     */
-    function __construct(User $model)
-    {
-        $this->model = $model;
+    public function selectAll(){
+        return DB::select("call users_identification_types.select_all_users()");
     }
 
-    /**
-     * @param Collection $joins
-     * @param $table
-     * @param $first
-     * @param $second
-     * @param string $join_type
-     */
-    private function addJoin(Collection &$joins, $table, $first, $second, $join_type = 'inner')
-    {
-        if (!$joins->has($table)) {
-            $joins->put($table, json_encode(compact('first', 'second', 'join_type')));
-        }
+    public function selectById(int $id){
+        return DB::select("call users_identification_types.select_user_id(?)", [$id]);
     }
 
-    /**
-     * @param array $filters
-     * @param bool $count
-     * @return mixed
-     */
-    public function search(array $filters = [], $count = false)
-    {
-        /** @var Builder $query */
-        $query = $this->model
-            ->distinct()
-            ->select('users.*');
+    public function create(int $identification_type_id, string $first_name, string $last_name, string $email, string $phone, string $birthday, string $created_at, string $password){
+        return DB::select('call insert_user(?,?,?,?,?,?,?,?)', [
+            $identification_type_id	,
+            $first_name,
+            $last_name,
+            $email,
+            $phone,
+            $birthday,
+            $created_at,
+            $password
+        ]);
+    }
 
-        $joins = collect();
+    public function update(int $id, int $identification_type_id, string $first_name, string $last_name, string $email, string $phone, string $birthday, string $updated_at){
+        return DB::select('call update_user_id(?,?,?,?,?,?,?,?)', [
+            $id,
+            $identification_type_id,
+            $first_name,
+            $last_name,
+            $email,
+            $phone,
+            $birthday,
+            $updated_at
+        ]);
+    }
 
-        $joins->each(function ($item, $key) use (&$query) {
-            $item = json_decode($item);
-            $query->join($key, $item->first, '=', $item->second, $item->join_type);
-        });
+    public function delete(string $id){
+        return DB::select("call users_identification_types.delete_user_id('{$id}')");
+    }
 
-
-        if ($count) {
-            return $query->count('users.id');
-        }
-
-        return $query->orderBy('users.id');
+    public function selectLast(){
+        return DB::select("call users_identification_types.select_last_user()");
     }
 
 }
