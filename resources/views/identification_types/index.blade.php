@@ -29,6 +29,7 @@
             <p>No Identification Types</p>
         @endforelse
     </table>
+    <button type="button" onclick="window.location='{{ url("/") }}'">Inicio</button>
 @endsection
 
 @section('script')
