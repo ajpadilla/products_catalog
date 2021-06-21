@@ -9,20 +9,25 @@
 @endsection
 
 @section('content')
-    <button type="button" onclick="window.location='{{ url("identificationTypes/create") }}'">Crear</button>
+    <button type="button" onclick="window.location='{{ url("users/create") }}'">Crear</button>
     <table style="width:100%">
         <tr>
-            <th style="text-align:left">Name</th>
-            <th style="text-align:left">Description</th>
-            <th style="text-align:left">Actions</th>
+            <th style="text-align:left">Identification Type</th>
+            <th style="text-align:left">First Name</th>
+            <th style="text-align:left">Last Name</th>
+            <th style="text-align:left">email</th>
+            <th style="text-align:left">Birthday</th>
         </tr>
-        @forelse ($identificationTypes as $identificationType)
+        @forelse ($users as $user)
             <tr>
-                <td>{{$identificationType->name}}</td>
-                <td>{{$identificationType->description}}</td>
+                <td>{{$user->identification_types_name}}</td>
+                <td>{{$user->first_name}}</td>
+                <td>{{$user->last_name}}</td>
+                <td>{{$user->email}}</td>
+                <td>{{$user->birthday}}</td>
                 <td>
-                    <a href="{{route('identificationTypes.edit', $identificationType->id)}}" class="">Editar</a>
-                    <a href="" class="delete" attr-id="{{$identificationType->id}}">Eliminar</a>
+                    <a href="{{route('users.edit', $user->id)}}" class="">Editar</a>
+                    <a href="" class="delete" attr-id="{{$user->id}}">Eliminar</a>
                 </td>
             </tr>
         @empty
@@ -38,6 +43,12 @@
 
     <script type="text/javascript">
 
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'API-KEY-LAIKA': '0123456789'
+            }
+        });
 
         $('.delete').on('click', function(event){
             event.preventDefault();
@@ -45,15 +56,13 @@
             if (confirm('Are you sure?')) {
                 // Post the form
                 $.ajax({
-                    url: "/api/v1/identificationTypes/"+id,
+                    url: "/api/v1/users/"+id,
                     type: "DELETE",
                     data:{
-                        name: $('#name').val(),
-                        description: $('#description').val()
                     },
                     success:function(response){
                         console.log(response);
-                        window.location = "/identificationTypes";
+                        window.location = "/users";
                     },
                     error: function(response) {
                     }
